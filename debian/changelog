@@ -1,3 +1,11 @@
+pyrad (2.1-2bb1) jammy; urgency=medium
+
+  * use poll() instead of select() in pyrad.Client
+    Under heavy load the 1024-descriptor limit of select() could lead to
+    ValueError: filedescriptor out of range in select()
+
+ -- Balabit Platform Team <devnull@dev.null>  Tue, 29 Dec 2020 02:05:26 +0100
+
 pyrad (2.1-2) unstable; urgency=medium
 
   * Team upload.
