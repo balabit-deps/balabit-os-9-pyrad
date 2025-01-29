@@ -1,3 +1,15 @@
+pyrad (2.4-0ubuntu0.22.04.1) jammy-security; urgency=medium
+
+  * Update to pyrad 2.4 as required by krb5 security update.
+    - debian/patches/0001-Add-parsing-for-octets.patch: Update the function
+      EncodeOctets from pyrad/tools.py to parse strings and integers.
+    - debian/patches/0002-Add-salt-decryption.patch: Add support for
+      decryption of salted attributes in pyrad/packet.py.
+    - debian/patches/0003-Strict-ipv4-ipv6-address-parsing.patch: Handle
+      the encoding and decoding of IPv4 and IPv6 addresses separately.
+
+ -- Nicolas Campuzano Jimenez <nicolas.campuzano@canonical.com>  Tue, 28 Jan 2025 22:11:25 -0500
+
 pyrad (2.1-2) unstable; urgency=medium
 
   * Team upload.

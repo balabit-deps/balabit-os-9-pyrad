@@ -1,0 +1,87 @@
+From 4f8c2ecbeb4d72ebd800eff55591e14f87caa3a8 Mon Sep 17 00:00:00 2001
+From:  <mark@ideco.ru>
+Date: Mon, 28 Nov 2022 01:23:41 +0200
+Subject: [PATCH] Strict IPv4/IPv6 addresses parsing
+
+[Canonical Notes: Cherry-picked to include only changes to pyrad/tools.py]
+---
+
+From 4f8c2ecbeb4d72ebd800eff55591e14f87caa3a8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=D0=9A=D0=BE=D1=80=D0=B5=D0=BD=D0=B1=D0=B5=D1=80=D0=B3=20?=
+ =?UTF-8?q?=E2=98=A2=EF=B8=8F=20=20=D0=9C=D0=B0=D1=80=D0=BA?=
+ <mark@ideco.ru>
+Date: Mon, 28 Nov 2022 01:23:41 +0200
+Subject: [PATCH] Strict IPv4/IPv6 addresses parsing
+
+---
+ pyrad/tools.py     | 18 +++++++++---------
+ setup.py           |  4 ++--
+ tests/testTools.py |  4 ++--
+ 3 files changed, 13 insertions(+), 13 deletions(-)
+
+Index: pyrad-2.4/pyrad/tools.py
+===================================================================
+--- pyrad-2.4.orig/pyrad/tools.py
++++ pyrad-2.4/pyrad/tools.py
+@@ -1,8 +1,8 @@
+ # tools.py
+ #
+ # Utility functions
+-from netaddr import IPAddress
+-from netaddr import IPNetwork
++from ipaddress import IPv4Address, IPv6Address
++from ipaddress import IPv4Network, IPv6Network
+ import struct
+ import six
+ import binascii
+@@ -43,20 +43,20 @@ def EncodeOctets(octetstring):
+ def EncodeAddress(addr):
+     if not isinstance(addr, six.string_types):
+         raise TypeError('Address has to be a string')
+-    return IPAddress(addr).packed
++    return IPv4Address(addr).packed
+ 
+ 
+ def EncodeIPv6Prefix(addr):
+     if not isinstance(addr, six.string_types):
+         raise TypeError('IPv6 Prefix has to be a string')
+-    ip = IPNetwork(addr)
++    ip = IPv6Network(addr)
+     return struct.pack('2B', *[0, ip.prefixlen]) + ip.ip.packed
+ 
+ 
+ def EncodeIPv6Address(addr):
+     if not isinstance(addr, six.string_types):
+         raise TypeError('IPv6 Address has to be a string')
+-    return IPAddress(addr).packed
++    return IPv6Address(addr).packed
+ 
+ 
+ def EncodeAscendBinary(str):
+@@ -113,8 +113,8 @@ def EncodeAscendBinary(str):
+         elif key == 'direction' and value == 'out':
+             terms[key] = b'\x00'
+         elif key == 'src' or key == 'dst':
+-            ip = IPNetwork(value)
+-            terms[key] = ip.ip.packed
++            ip = IPv4Network(value)
++            terms[key] = ip.network_address.packed
+             terms[key+'l'] = struct.pack('B', ip.prefixlen)
+         elif key == 'sport' or key == 'dport':
+             terms[key] = struct.pack('!H', int(value))
+@@ -167,13 +167,13 @@ def DecodeAddress(addr):
+ def DecodeIPv6Prefix(addr):
+     addr = addr + b'\x00' * (18-len(addr))
+     _, length, prefix = ':'.join(map('{0:x}'.format, struct.unpack('!BB'+'H'*8, addr))).split(":", 2)
+-    return str(IPNetwork("%s/%s" % (prefix, int(length, 16))))
++    return str(IPv6Network("%s/%s" % (prefix, int(length, 16))))
+ 
+ 
+ def DecodeIPv6Address(addr):
+     addr = addr + b'\x00' * (16-len(addr))
+     prefix = ':'.join(map('{0:x}'.format, struct.unpack('!'+'H'*8, addr)))
+-    return str(IPAddress(prefix))
++    return str(IPv6Address(prefix))
+ 
+ 
+ def DecodeAscendBinary(str):

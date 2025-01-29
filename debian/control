@@ -1,7 +1,8 @@
 Source: pyrad
 Section: python
 Priority: optional
-Maintainer: Jeremy Lainé <jeremy.laine@m4x.org>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Jeremy Lainé <jeremy.laine@m4x.org>
 Uploaders: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>, Bjorn Ove Grotan <bgrotan@grotan.com>
 Build-Depends: debhelper-compat (= 9),
                dh-python,
