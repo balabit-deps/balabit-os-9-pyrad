@@ -110,11 +110,10 @@ def EncodeAscendBinary(str):
             terms[key] = struct.pack('B', int(value))
 
     trailer = 8 * b'\x00'
-    result = b'%s%s%s\x00%s%s%s%s%s\x00%s%s%s%s\x00\x00%s' % (
-        terms['family'], terms['action'], terms['direction'], terms['src'],
-        terms['dst'], terms['srcl'], terms['dstl'], terms['proto'],
-        terms['sport'], terms['dport'], terms['sportq'], terms['dportq'],
-        trailer)
+
+    result = b''.join((terms['family'], terms['action'], terms['direction'], b'\x00', 
+        terms['src'], terms['dst'], terms['srcl'], terms['dstl'], terms['proto'], b'\x00',
+        terms['sport'], terms['dport'], terms['sportq'], terms['dportq'], b'\x00\x00', trailer))
     return result
 
 
@@ -125,6 +124,12 @@ def EncodeInteger(num, format='!I'):
         raise TypeError('Can not encode non-integer as integer')
     return struct.pack(format, num)
 
+def EncodeInteger64(num, format='!Q'):
+    try:
+        num = int(num)
+    except:
+        raise TypeError('Can not encode non-integer as integer64')
+    return struct.pack(format, num)
 
 def EncodeDate(num):
     if not isinstance(num, int):
@@ -149,13 +154,13 @@ def DecodeAddress(addr):
 
 def DecodeIPv6Prefix(addr):
     addr = addr + b'\x00' * (18-len(addr))
-    _, length, prefix = ':'.join(map('{:x}'.format, struct.unpack('!BB'+'H'*8, addr))).split(":", 2)
+    _, length, prefix = ':'.join(map('{0:x}'.format, struct.unpack('!BB'+'H'*8, addr))).split(":", 2)
     return str(IPNetwork("%s/%s" % (prefix, int(length, 16))))
 
 
 def DecodeIPv6Address(addr):
     addr = addr + b'\x00' * (16-len(addr))
-    prefix = ':'.join(map('{:x}'.format, struct.unpack('!'+'H'*8, addr)))
+    prefix = ':'.join(map('{0:x}'.format, struct.unpack('!'+'H'*8, addr)))
     return str(IPAddress(prefix))
 
 
@@ -166,6 +171,8 @@ def DecodeAscendBinary(str):
 def DecodeInteger(num, format='!I'):
     return (struct.unpack(format, num))[0]
 
+def DecodeInteger64(num, format='!Q'):
+    return (struct.unpack(format, num))[0]
 
 def DecodeDate(num):
     return (struct.unpack('!I', num))[0]
@@ -194,6 +201,8 @@ def EncodeAttr(datatype, value):
         return EncodeInteger(value, '!B')
     elif datatype == 'date':
         return EncodeDate(value)
+    elif datatype == 'integer64':
+        return EncodeInteger64(value)
     else:
         raise ValueError('Unknown attribute type %s' % datatype)
 
@@ -221,5 +230,7 @@ def DecodeAttr(datatype, value):
         return DecodeInteger(value, '!B')
     elif datatype == 'date':
         return DecodeDate(value)
+    elif datatype == 'integer64':
+        return DecodeInteger64(value)
     else:
         raise ValueError('Unknown attribute type %s' % datatype)
